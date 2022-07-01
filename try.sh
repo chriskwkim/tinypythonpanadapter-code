@@ -15,4 +15,4 @@
 #python iq.py --RTL --WATERFALL --n_buffers=10 --size=384 
 
 # Audio test, PC, Si570 / SoftRock
-python iq.py --SI570 --WATERFALL --index=0 --size=512 --n_buffers=8 --rate=48000
+python3 iq.py --SI570 --WATERFALL --index=0 --size=512 --n_buffers=8 --rate=48000

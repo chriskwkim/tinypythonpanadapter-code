@@ -74,35 +74,35 @@ opt = options.opt   # Get option object from options module
 
 
 # print list of parameters to console.
-print "identification:", opt.ident
-print "source        :", opt.source
-print "freq control  :", opt.control
-print "waterfall     :", opt.waterfall
-print "rev i/q       :", opt.rev_iq
-print "sample rate   :", opt.sample_rate
-print "size          :", opt.size
-print "buffers       :", opt.buffers
-print "skipping      :", opt.skip
-print "hamlib        :", opt.hamlib
-print "hamlib rigtype:", opt.hamlib_rigtype
-print "hamlib device :", opt.hamlib_device
+print ("identification:", opt.ident)
+print ("source        :", opt.source)
+print ("freq control  :", opt.control)
+print ("waterfall     :", opt.waterfall)
+print ("rev i/q       :", opt.rev_iq)
+print ("sample rate   :", opt.sample_rate)
+print ("size          :", opt.size)
+print ("buffers       :", opt.buffers)
+print ("skipping      :", opt.skip)
+print ("hamlib        :", opt.hamlib)
+print ("hamlib rigtype:", opt.hamlib_rigtype)
+print ("hamlib device :", opt.hamlib_device)
 if opt.source=="rtl":
-    print "rtl frequency :", opt.rtl_frequency
-    print "rtl gain      :", opt.rtl_gain
+    print ("rtl frequency :", opt.rtl_frequency)
+    print ("rtl gain      :", opt.rtl_gain)
 if opt.control=="si570":
-    print "si570 frequency :", opt.si570_frequency
-print "pulse         :", opt.pulse
-print "fullscreen    :", opt.fullscreen
-print "hamlib intvl  :", opt.hamlib_interval
-print "cpu load intvl:", opt.cpu_load_interval
-print "wf accum.     :", opt.waterfall_accumulation
-print "wf palette    :", opt.waterfall_palette
-print "sp_min, max   :", opt.sp_min, opt.sp_max
-print "v_min, max    :", opt.v_min, opt.v_max
-#print "max queue dept:", opt.max_queue
-print "PCM290x lagfix:", opt.lagfix
+    print ("si570 frequency :", opt.si570_frequency)
+print ("pulse         :", opt.pulse)
+print ("fullscreen    :", opt.fullscreen)
+print ("hamlib intvl  :", opt.hamlib_interval)
+print ("cpu load intvl:", opt.cpu_load_interval)
+print ("wf accum.     :", opt.waterfall_accumulation)
+print ("wf palette    :", opt.waterfall_palette)
+print ("sp_min, max   :", opt.sp_min, opt.sp_max)
+print ("v_min, max    :", opt.v_min, opt.v_max)
+#print ("max queue dept:", opt.max_queue)
+print ("PCM290x lagfix:", opt.lagfix)
 if opt.lcd4:
-    print "LCD4 brightnes:", opt.lcd4_brightness
+    print ("LCD4 brightnes:", opt.lcd4_brightness)
 
 def quit_all():
     """ Quit pygames and close std outputs somewhat gracefully.
@@ -128,7 +128,7 @@ class LED(object):
             colors = dictionary with color_values and PyGame Color specs
         """
         self.surface = pg.Surface((width, width))
-        self.wd2 = width/2
+        self.wd2 = width//2
         return
 
     def get_LED_surface(self, color):
@@ -208,7 +208,7 @@ class Graticule(object):
             Lines are always drawn at 10 dB intervals.
         """
         if not sp_max > sp_min:
-            print "Invalid dB scale setting requested!"
+            print ("Invalid dB scale setting requested!")
             quit_all()
         self.sp_max = sp_max
         self.sp_min = sp_min
@@ -303,7 +303,7 @@ y_2d = 20. # y position of 2d disp. (screen top = 0)
 if opt.size > w_spectra:
     for n in [1024, 512, 256, 128]:
         if n <= w_spectra:
-            print "*** Size was reset from %d to %d." % (opt.size, n)
+            print ("*** Size was reset from %d to %d." % (opt.size, n))
             opt.size = n    # Force size to be 2**k (ok, reasonable choice?)
             break
 chunk_size = opt.buffers * opt.size # No. samples per chunk (pyaudio callback)
@@ -320,7 +320,7 @@ led_urun = LED(10)
 led_clip = LED(10)
 
 # Waterfall geometry
-h_wf = SCREEN_SIZE[1]/3         # Height of waterfall (3d spectrum)
+h_wf = SCREEN_SIZE[1]//3         # Height of waterfall (3d spectrum)
 y_wf = y_2d + h_2d              # Position just below 2d surface
 
 # Surface for waterfall (3d) spectrum
@@ -348,7 +348,7 @@ if opt.waterfall:
     mywf = wf.Wf(opt, v_min, v_max, nsteps, wf_pixel_size)
 
 if (opt.control == "si570") and opt.hamlib:
-    print "Warning: Hamlib requested with si570.  Si570 wins! No Hamlib."
+    print ("Warning: Hamlib requested with si570.  Si570 wins! No Hamlib.")
 if opt.hamlib and (opt.control != "si570"):
     import Hamlib
     # start up Hamlib rig connection
@@ -364,15 +364,15 @@ if opt.hamlib and (opt.control != "si570"):
                         args = (opt.hamlib_interval, rig))
     hl_thread.daemon = True
     hl_thread.start()
-    print "Hamlib thread started."
+    print ("Hamlib thread started.")
 else:
-    print "Hamlib not requested."
+    print ("Hamlib not requested.")
 
 # Create thread for cpu load monitor
 lm_thread = threading.Thread(target=cpu_load, args = (opt.cpu_load_interval,))
 lm_thread.daemon = True
 lm_thread.start()
-print "CPU monitor thread started."
+print ("CPU monitor thread started.")
 
 # Create graticule providing 2d graph calibration.
 mygraticule = Graticule(opt, smfont, h_2d, w_spectra, GRAT_COLOR, GRAT_COLOR_2)
@@ -390,7 +390,7 @@ wparms, hparms = medfont.size(parms_msg)
 parms_matter = pg.Surface((wparms, hparms) )
 parms_matter.blit(medfont.render(parms_msg, 1, TCOLOR2), (0,0))
 
-print "Update interval = %.2f ms" % float(1000*chunk_time)
+print ("Update interval = %.2f ms" % float(1000*chunk_time))
 
 # Initialize input mode, RTL or AF
 # This starts the input stream, so place it close to start of main loop.
@@ -402,7 +402,7 @@ elif opt.source=='audio':         # input from audio card
     mainqueueLock = af.queueLock    # queue and lock only for soundcard
     dataIn = af.DataInput(opt)
 else:
-    print "unrecognized mode"
+    print ("unrecognized mode")
     quit_all()
 
 if opt.control=="si570":
@@ -513,9 +513,20 @@ while True:
     ylist = list(sp_scaled)
     ylist = [ h_2d - x for x in ylist ]                 # flip the y's
     lylist = len(ylist)
-    xlist = [ x* w_spectra/lylist for x in xrange(lylist) ]
+    xlist = [ x* w_spectra/lylist for x in range(lylist) ]
     # Draw the spectrum based on our data lists.
-    pg.draw.lines(surf_2d, WHITE, False, zip(xlist,ylist), 1)
+
+
+    print("Debugging")
+    print("surf_2d", surf_2d)
+    print("WHITE", WHITE)
+    print(len(xlist))
+    print(len(ylist))
+    print("zip(xlist, ylist)", zip(xlist, ylist))
+
+    points = zip(xlist, ylist)
+    print(points)
+    pg.draw.lines(surf_2d, WHITE, False, tuple(points), 1)
 
     # Place 2d spectrum on main surface
     surf_main.blit(surf_2d, (x_spectra, y_2d))
@@ -675,7 +686,7 @@ while True:
                         finc = 1.0 if shifted else 0.1
                         rigfreq_request = rigfreq + finc
                     else:
-                        print "Rt arrow ignored, no Hamlib"
+                        print ("Rt arrow ignored, no Hamlib")
                 elif event.key == pg.K_LEFT:         # left arrow - freq
                     if opt.control == 'rtl':
                         finc = -100e3 if shifted else -10e3
@@ -687,11 +698,11 @@ while True:
                         finc = -1.0 if shifted else -0.1
                         rigfreq_request = rigfreq + finc
                     else:
-                        print "Lt arrow ignored, no Hamlib"
+                        print ("Lt arrow ignored, no Hamlib")
                 elif event.key == pg.K_UP:
-                    print "Up"
+                    print ("Up")
                 elif event.key == pg.K_DOWN:
-                    print "Down"
+                    print ("Down")
                 elif event.key == pg.K_RETURN:
                     info_phase  += 1            # Jump to phase 1 or 2 overlay
                     info_counter = 0            #   (next time)

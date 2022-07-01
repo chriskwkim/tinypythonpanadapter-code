@@ -160,5 +160,5 @@ if opt.source_rtl and (opt.sample_rate == DEF_SAMPLE_RATE):
 # Main module will use: options.opt to pick up this 'opt' instance.
 
 if __name__ == '__main__':
-    print 'debug'
+    print ('debug')
 

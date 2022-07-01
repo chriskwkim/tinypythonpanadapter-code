@@ -39,5 +39,5 @@ class RTL_In(object):
         return  self.rtl.read_samples(size)
 
 if __name__ == '__main__':
-    print "Debug"
+    print ("Debug")
 

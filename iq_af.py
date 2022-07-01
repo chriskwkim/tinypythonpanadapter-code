@@ -27,7 +27,7 @@
 #    implement 'skip'
 
 import sys, time, threading
-import Queue
+import queue as Queue
 import pyaudio as pa
 
 # CALLBACK ROUTINE
@@ -84,8 +84,8 @@ def pa_callback_iqin(in_data, f_c, time_info, status):
         cbqueue.put_nowait(in_data)     # queue should sync with main thread
         queueLock.release()
     except Queue.Full:
-        print "ERROR: Internal queue is filled.  Reconfigure to use less CPU."
-        print "\n\n (Ignore remaining errors!)"
+        print ("ERROR: Internal queue is filled.  Reconfigure to use less CPU.")
+        print ("\n\n (Ignore remaining errors!)")
         sys.exit()
     return (None, pa.paContinue)    # Return to pyaudio.  All OK.
 # END OF CALLBACK ROUTINE
@@ -98,7 +98,7 @@ class DataInput(object):
         # Initialize pyaudio (A python mapping of PortAudio) 
         # Consult pyaudio documentation.
         self.audio = pa.PyAudio()   # generates lots of warnings.
-        print
+        print()
         self.Restart(opt)
         return
         
@@ -106,18 +106,18 @@ class DataInput(object):
         global cbqueue, cbskip
 
         cbskip = opt.skip
-        print
+        print()
         # set up stereo / 48K IQ input channel.  Stream will be started.
         if opt.index < 0:       # Find pyaudio's idea of default index
             defdevinfo = self.audio.get_default_input_device_info()
-            print "Default device index is %d; id='%s'"% \
-                    (defdevinfo['index'], defdevinfo['name'])
+            print ("Default device index is %d; id='%s'"% \
+                    (defdevinfo['index'], defdevinfo['name']))
             af_using_index = defdevinfo['index']
         else:
             af_using_index = opt.index              # Use user's choice of index
             devinfo = self.audio.get_device_info_by_index(af_using_index)
-            print "Using device index %d; id='%s'" % \
-                    (devinfo['index'], devinfo['name'])
+            print ("Using device index %d; id='%s'" % \
+                    (devinfo['index'], devinfo['name']))
         try:
             # Verify this is a supported mode.
             support = self.audio.is_format_supported(
@@ -126,9 +126,10 @@ class DataInput(object):
                     rate=opt.sample_rate,           # typ. 48000
                     input_device=af_using_index)
         except ValueError as e:
-            print "ERROR self.audio.is_format_supported", e
+            print ("ERROR self.audio.is_format_supported", e)
             sys.exit()
-        print "Requested audio mode is supported:", support
+        print ("Requested audio mode is supported:", support)
+
         self.afiqstream = self.audio.open( 
                     format=pa.paInt16,          # 16 bit samples
                     channels=2,                 # 2 channels
@@ -144,7 +145,7 @@ class DataInput(object):
         while cbqueue.qsize() < 4:
             timeout -= 1
             if timeout <= 0: 
-                print "timeout waiting for queue to become non-empty!"
+                print ("timeout waiting for queue to become non-empty!")
                 sys.exit()
             time.sleep(.1)
         queueLock.acquire()
@@ -173,5 +174,5 @@ class DataInput(object):
         self.audio.terminate()
 
 if __name__ == '__main__':
-    print 'debug'           # Insert module test code below
+    print ('debug')           # Insert module test code below
 

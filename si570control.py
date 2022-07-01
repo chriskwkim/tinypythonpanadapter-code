@@ -63,7 +63,7 @@ class Si570control(object):
         self.context = usb1.USBContext()
         self.device = self.context.getByVendorIDAndProductID(vendor_id, product_id)
         if self.verbose:
-            print "device", self.device
+            print ("device", self.device)
         self.handle = self.device.open()
         self.version = self.getVersion()
 
@@ -74,25 +74,25 @@ class Si570control(object):
         if len(bb)==2:
             ver = "%d.%d" % (bb[1], bb[0])
             if self.verbose:
-                print "Version", ver
+                print ("Version", ver)
             return ver
         else:
             if self.verbose:
-                print "Version Unknown."
+                print ("Version Unknown.")
             return None
 
     def enum_devices(self):
         mydevices = self.context.getDeviceList()
-        print "n=",len(mydevices)
+        print ("n=",len(mydevices))
         for i,x in enumerate(mydevices):
-            print "%2d %2d %d %3d %d %d %0.4x %0.4x" % (i, 
+            print ("%2d %2d %d %3d %d %d %0.4x %0.4x" % (i, 
                             x.getBusNumber(),
                             x.getDeviceAddress(),
                             x.getDeviceClass(),
                             x.getDeviceProtocol(),
                             x.getDeviceSpeed(),
                             x.getVendorID(),
-                            x.getProductID() )
+                            x.getProductID() ))
 
     def getFreqByValue(self):   # return osc freq / multiplier
         bb = bytearray( self.handle.controlRead
@@ -109,7 +109,7 @@ class Si570control(object):
                 (UFLGS1, REQUEST_READ_REGISTERS, SI570_I2C_ADDR, 0, 6, 5000) )
         if len(bb) > 0:
             for i in range(6):
-                print "Register %d = %X (%d)" % ( i+7, bb[i], bb[i] )
+                print ("Register %d = %X (%d)" % ( i+7, bb[i], bb[i] ))
 
     def calculateFreq(self, s): # s is string, could be bytearray?
         si = bytearray(s)
@@ -120,11 +120,11 @@ class Si570control(object):
         HS_DIV = (si[0] & 0xE0) >> 5
         fout = self.fXtal * RFREQ / ((N1 + 1) * HS_DIV_MAP[HS_DIV])
         if self.verbose >= 2:
-            print "RFREQ = %f" % RFREQ
-            print "N1 = %d" % N1
-            print "HS_DIV = %d" % HS_DIV
-            print "nHS_DIV = %d" % HS_DIV_MAP[HS_DIV]
-            print "fout = %f" % fout
+            print ("RFREQ = %f" % RFREQ)
+            print ("N1 = %d" % N1)
+            print ("HS_DIV = %d" % HS_DIV)
+            print ("nHS_DIV = %d" % HS_DIV_MAP[HS_DIV])
+            print ("fout = %f" % fout)
         return fout         # actual osc freq.
         
     def getFreq(self):      # return osc freq / multiplier
@@ -135,7 +135,7 @@ class Si570control(object):
         if len(bb) > 0:
             if self.verbose >= 2:
                 for i in range(6):
-                    print "Register %d = %X (%d)" % ( i+7, bb[i], bb[i] )
+                    print ("Register %d = %X (%d)" % ( i+7, bb[i], bb[i] ))
             return self.calculateFreq(strg) / self.multiplier
         else:
             return None
@@ -163,7 +163,7 @@ class Si570control(object):
         bb = bytearray( self.handle.controlRead
                 (UFLGS1, REQUEST_SET_PTT, value, 0, 3, 5000) )
         if self.verbose >= 2:
-            print "buffer=",bb[0],bb[1],bb[2]
+            print ("buffer=",bb[0],bb[1],bb[2])
 
     def calcDividers(self, f): # Returns solution = [HS_DIV, N1, f0, RFREQ]
         # Instead of solution structure, use simple list for each variable.
@@ -198,11 +198,11 @@ class Si570control(object):
         if imin >= 0:
             solution = [ cHS_DIV[imin], cN1[imin], cf0[imin], cf0[imin]/self.fXtal ]
             if (self.verbose >= 2):
-                print "Solution:"
-                print "  HS_DIV = %d" % solution[0]
-                print "  N1 = %d" % solution[1]
-                print "  f0 = %f" % solution[2]
-                print "  RFREQ = %f" % solution[3]
+                print ("Solution:")
+                print ("  HS_DIV = %d" % solution[0])
+                print ("  N1 = %d" % solution[1])
+                print ("  f0 = %f" % solution[2])
+                print ("  RFREQ = %f" % solution[3])
         else:
             solution = None     # This is the error return
         return solution
@@ -221,7 +221,7 @@ class Si570control(object):
         value = 0x700 + self.i2c
         index = 0
         if self.verbose:
-            print "Setting Si570 Frequency by registers to: %f" % f
+            print ("Setting Si570 Frequency by registers to: %f" % f)
         sHS_DIV, sN1, sf0, sRFREQ = self.calcDividers(f)
         RFREQ_int = math.trunc(sRFREQ)
         RFREQ_frac= int( round((sRFREQ - RFREQ_int) * 268435456) ) # check int ok
@@ -241,10 +241,10 @@ class Si570control(object):
                 (UFLGS2, REQUEST_SET_FREQ, value, index, sout, 5000)
         if r:
             if self.verbose >= 2:
-                print "Set Freq Buffer",
-                print "%x %x" % (outbuf[0], outbuf[1])
+                print ("Set Freq Buffer",)
+                print ("%x %x" % (outbuf[0], outbuf[1]))
         else:
-            print "Failed writing frequency to device"
+            print ("Failed writing frequency to device")
 
     def setFreqByValue(self, frequency):
         f = self.multiplier * frequency
@@ -252,10 +252,10 @@ class Si570control(object):
         index = 0
         buf = self.setLongWord(round(f * 2097152.0))
         if self.verbose:
-            print "Setting Si570 Frequency by value to: %f" % f
+            print ("Setting Si570 Frequency by value to: %f" % f)
             if self.verbose >= 2:
-                print "Set Freq Buffer: %x %x %x %x" % (buf[0], buf[1], 
-                        buf[2], buf[3])
+                print ("Set Freq Buffer: %x %x %x %x" % (buf[0], buf[1], 
+                        buf[2], buf[3]))
         sout = str()
         for x in buf:
             sout += chr(x)
@@ -263,34 +263,34 @@ class Si570control(object):
                 (UFLGS2, REQUEST_SET_FREQ_BY_VALUE, value, index, sout, 5000)
         if r:
             if self.verbose >= 2:
-                print "Set Freq Buffer: %x %x %x %x" % (buf[0], buf[1], 
-                        buf[2], buf[3])
+                print ("Set Freq Buffer: %x %x %x %x" % (buf[0], buf[1], 
+                        buf[2], buf[3]))
         else:
-            print "Failed setting frequency"
+            print ("Failed setting frequency")
 # End of Si570 class
 
 if __name__ == "__main__":
     # debug code goes here
     si = Si570control(verbose=0)
     freq = si.getFreqByValue()
-    print "freq by value", freq
+    print ("freq by value", freq)
     #si.getRegisters()
 
     #f = si.getFreq()
-    #print "returned freq", f
+    #print ("returned freq", f)
 
     #si.setFreq( 1.8)
-    #print "set freq check"
+    #print ("set freq check")
     #si.getFreq()
 
-    print "SET FREQ BY VALUE"
+    print ("SET FREQ BY VALUE")
     si.setFreqByValue(7.5)
-    print "checking"
-    print si.getFreqByValue()
+    print ("checking")
+    print (si.getFreqByValue())
 
     if False:
-        print "Calc. dividers [HS_DIV, N1, f0, RFREQ]"
+        print ("Calc. dividers [HS_DIV, N1, f0, RFREQ]")
         a = si.calcDividers(28.0)
-        print a
-    print "Done."
+        print (a)
+    print ("Done.")
 

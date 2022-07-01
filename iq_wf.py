@@ -54,7 +54,7 @@ def palette_color(palette, val, vmin0, vmax0):
         g = bright * 128 *(1.0 + math.cos(tpi*f + tpi/3))
         b = bright * 128 *(1.0 + math.cos(tpi*f + 2*tpi/3))
     else:
-        print "Invalid palette requested!"
+        print ("Invalid palette requested!")
         sys.exit()
     return ( max(0,min(255,r)), max(0,min(255,g)), max(0,min(255,b)) )
 
@@ -119,7 +119,7 @@ class Wf(object):
             return
         else:
             surface.blit(surface, (0, self.pixel_size[1]))  # push old wf down one row
-            for ix in xrange(self.datasize):
+            for ix in range(self.datasize):
                 v = datalist[ix] #self.wfacc[ix] / nsum #datalist[ix]        # dB units
                 vi = int( self.nsteps * (v-self.vmin) / (self.vmax-self.vmin) )
                 vi = max(0, min(vi, self.nsteps-1) )
